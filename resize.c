@@ -7,19 +7,29 @@
  * 6) Return pointer to new hashtable.
  */
 
-Word *resize(Word *hashtable, int size)
+#include <stdlib.h>
+#include "fw.h"
+
+Word **resize(Word **hashtable, int size)
 {
 	int newSize = size * 2 + 1;
 	int collision = 0;
 	int i = 0;
-	Word *newtable[newSize] = {NULL};
+	Word **newtable;
+	unsigned int hash;
+	newtable = malloc(newSize * sizeof(Word));
+	for(i = 0; i < newSize; i++)
+	{
+		newtable[i] = NULL;
+	}
+	i = 0;
 	while (size > 0)
 	{
 		size--;
-		unsigned int hash = hash_code(hashtable[size]->word);
+		hash = hash_code(hashtable[size]->word);
 		if (newtable[hash] == NULL)
 		{
-			newtable[hash] = *hashtable[size];
+			*newtable[hash] = *hashtable[size];
 		}
 		else
 		{
@@ -27,9 +37,9 @@ Word *resize(Word *hashtable, int size)
 			collision = 1;
 			while (collision)
 			{
-				if((hash + i*i) % newSize == NULL)
+				if(newtable[(hash + i*i) % newSize] == NULL)
 				{
-					newtable[(hash + i*i) % newSize] = *hashtable[size];
+					*newtable[(hash + i*i) % newSize] = *hashtable[size];
 					collision = 0;
 				}
 				i++;
