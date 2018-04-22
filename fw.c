@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 /* #include "fw.h" */
-
 #define hashsize 101
 
 struct word {
