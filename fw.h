@@ -3,7 +3,6 @@
 #ifndef FW_H
 #define FW_H
 
-
 extern int size;
 
 struct word{

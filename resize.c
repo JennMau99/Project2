@@ -7,7 +7,6 @@
  * 6) Return pointer to new hashtable.
  */
 
-
 #include <stdlib.h>
 #include "fw.h"
 
