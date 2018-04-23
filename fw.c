@@ -39,16 +39,20 @@ Word **make_table(int size)
 }
 void print_table(int wordnum)
 {
-	int i = 0;
- 	while(i < wordnum && i < tablesize)
+	int i = tablesize - 1;
+	int a = wordnum;
+	fprintf(stderr, "The top %d words (out of %d) are:\n", wordnum, tableitems);
+ 	while(i >= 0 && a > 0)
         {
+		
                 if(hashtable[i] != NULL){
-                        fprintf(stderr, "%s, %d\n", hashtable[i]->word, hashtable[i]->frequency);
-                        fprintf(stderr, "\n");
-                }
-
-                i++;
+                        fprintf(stderr, "\t%d %s\n", hashtable[i]->frequency, hashtable[i]->word);
+             		a--;
+		}
+                i--;
         }
+
+	
 }
 void printtable(Word **hashtable)
 {
@@ -90,15 +94,14 @@ void hash_words(int filename, char **argv, int argc)
 				}
 				index = get_index(hash_code(token), token, 1);
 				if(hashtable[index] == NULL){
-			
-				hashtable[index] = hash_node(token, 1); 				
+					hashtable[index] = hash_node(token, 1);
+					tableitems++; 		
 				}	
 				else 
 				{	
 				hashtable[index]->frequency++;
 				}
 					
-				tableitems++;
 				token = strtok(NULL, " \n");
 
 			}
