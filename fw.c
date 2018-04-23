@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 /* #include "fw.h" */
-#define hashsize 101
 
 struct word {
 	char *word;
@@ -12,10 +11,14 @@ struct word {
 
 typedef struct word Word;
 
-static Word hashtable[hashsize];
+static Word **hashtable;
 
 Word hash_node(char *s);
 int hash_code(char *s);
+Word **make_table(int size);
+void hash_words(int f, char **a, int b);
+void delete(Word **hashtable, int size);
+Word **resize(Word **hashtable, int size);
 
 Word **make_table(int size)
 {
@@ -32,6 +35,7 @@ void hash_words(int filename, char **argv, int argc)
 	FILE *fp;
 	char *token;
 	char str[100];
+	
 	while(filename < argc)
 	{
 		fp = fopen(argv[filename], "r");
@@ -110,11 +114,6 @@ int main(int argc, char **argv)
  * 6) Return pointer to new hashtable.
  */
 
-#include <stdlib.h>
-#include "fw.h"
-
-
-void delete(Word **hashtable, int size);
 
 Word **resize(Word **hashtable, int size)
 {
