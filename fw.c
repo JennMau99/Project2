@@ -17,7 +17,16 @@ static Word hashtable[hashsize];
 Word hash_node(char *s);
 int hash_code(char *s);
 
-void hash_words(int filename, char **argv, int argc)
+Word **make_table(int size)
+{
+	int i = 0;
+	Word **newtable =  malloc(size *sizeof(Word));
+	for(i = 0; i < newSize; i++)
+        {
+                newtable[i] = NULL;
+        }
+}
+
 {
 	FILE *fp;
 	char *token;
@@ -72,8 +81,6 @@ int get_index(int hashval)
 
 int main(int argc, char **argv)
 {
-<<<<<<< HEAD
-=======
 	int wordnum = 10;	
 	int filenames = 0;
 	if(argc > 2 && (strcmp(argv[1], "-n") == 0))
@@ -93,4 +100,3 @@ int main(int argc, char **argv)
 }
 
 	
->>>>>>> a2d603fe20f5b48c982492069f56f456656aafe6
