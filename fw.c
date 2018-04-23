@@ -15,16 +15,16 @@ static Word **hashtable;
 int tablesize;
 int tableitems;
 
-Word *hash_node(char *s);
+Word *hash_node(char *s, int freq);
 unsigned int hash_code(char *s);
 Word **make_table(int size);
 void hash_words(int f, char **a, int b);
 void delete(Word **hashtable, int size);
 Word **resize(Word **hashtable);
-int get_index(unsigned int hashval);
+int get_index(unsigned int hashval, char *s, int resize);
 Word **sort(Word **hashtable);
 int compare(const void *a, const void *b);
-void print_table();
+void print_table(int wordnum);
 
 Word **make_table(int size)
 {
@@ -37,13 +37,13 @@ Word **make_table(int size)
 	tablesize = size;
 	return newtable;
 }
-void print_table()
+void print_table(int wordnum)
 {
 	int i = 0;
- 	while(i < tablesize)
+ 	while(i < wordnum && i < tablesize)
         {
                 if(hashtable[i] != NULL){
-                        fprintf(stderr, hashtable[i]->word);
+                        fprintf(stderr, "%s, %d\n", hashtable[i]->word, hashtable[i]->frequency);
                         fprintf(stderr, "\n");
                 }
 
@@ -67,7 +67,6 @@ void hash_words(int filename, char **argv, int argc)
 {
 	FILE *fp;
 	char *token;
-	char *copy;
 	char str[100];
 	int size = 2;
 	unsigned int index;
@@ -87,16 +86,18 @@ void hash_words(int filename, char **argv, int argc)
 			while( token != NULL ) {
 				if((tableitems/tablesize) > 0.5)
 				{
-					fprintf(stderr, "resized\n");
 					hashtable = resize(hashtable);
 				}
-			/*	IRR: if(get_index(hash_code(token), token) != -1){
-			*/
-				index = get_index(hash_code(token));		
-				hashtable[index] = hash_node(token); 				
-				fprintf(stderr, "%d %s\n", index, hashtable[index]->word);
+				index = get_index(hash_code(token), token, 1);
+				if(hashtable[index] == NULL){
+			
+				hashtable[index] = hash_node(token, 1); 				
+				}	
+				else 
+				{	
+				hashtable[index]->frequency++;
+				}
 					
-				
 				tableitems++;
 				token = strtok(NULL, " \n");
 
@@ -107,15 +108,14 @@ void hash_words(int filename, char **argv, int argc)
 		
 	}
 	
-	print_table();
 }
 
-Word* hash_node(char *s)
+Word* hash_node(char *s, int freq)
 {
 	Word * new_node = (Word*)(malloc(sizeof(Word)));
 	new_node->word = malloc(strlen(s) + 1);
 	strcpy(new_node->word, s);
-	new_node->frequency = 1;
+	new_node->frequency = freq;
 	return new_node;
 }
 
@@ -137,22 +137,25 @@ unsigned int hash_code(char *s)
 
 }   
 
-int get_index(unsigned int hashval)
+int get_index(unsigned int hashval, char *s, int resize)
 {
 	int i = 0;
 	/* Unnecessary comparison- this shouldn't be NULL since it's an int */
-	
+	int *a;		
 	while (1)
 	{
-		if(hashtable[((hashval + i * i) % tablesize)] == NULL)
+		if(resize == 1 && hashtable[((hashval + i * i) % tablesize)] != NULL)
+		{
+		/*only enters if not being resize*/	
+			if(strcmp(hashtable[((hashval + i * i) % tablesize)]->word, s) == 0)
+                	{
+				return ((hashval + i * i) % tablesize);
+                        }
+                }
+		else if(hashtable[((hashval + i * i) % tablesize)] == NULL)
 		{
 			return ((hashval + i*i) % tablesize);
 		}
-		/*if(strcmp(hashtable[((hashval + i * i) % tablesize)]->word, s) == 0)
-		{
-			fprintf(stderr, "MATCH");
-			return -1;
-		}*/
 		
 		i++;
 	}
@@ -165,10 +168,9 @@ int main(int argc, char **argv)
 {
 	int wordnum = 10;	
 	int filenames = 0;
-	int i = 0;
 	if(argc > 2 && (strcmp(argv[1], "-n") == 0))
 	{
-		wordnum = argv[2][0];
+		wordnum = atoi(argv[2]);
 		if(argc > 2)
 		{	
 			filenames = 3;
@@ -178,25 +180,10 @@ int main(int argc, char **argv)
 	{
 		filenames = 1;
 	}
-	
+
  	hash_words(filenames, argv, argc);
-	fprintf(stderr, "%d tablesize \n", tablesize);
-	/*hashtable = sort(hashtable);
-	while (*wordnum > 0 i < tablesize)
-	{
-		printf("%d %s", hashtable[tablesize - i - 1]->frequency, hashtable[tablesize - i - 1]->word);
-		i++, wordnum--;
-		if(hashtable[i] == NULL)
-		{
-			fprintf(stderr, "NULL");
-		}
-		else
-		{
-			fprintf(stderr, hashtable[i]->word);
-		}
-		i++;
-		
-	}*/
+	hashtable = sort(hashtable);
+	print_table(wordnum);
 
 
 
@@ -213,38 +200,52 @@ int main(int argc, char **argv)
  * 6) Return pointer to new hashtable.
  */
 
+int get_index_resize(Word **table, unsigned int hashval, char *s)
+{
+        int i = 0;
+        /* Unnecessary comparison- this shouldn't be NULL since it's an int */
+        int *a;
+        while (1)
+        {
+                if(table[((hashval + i * i) % tablesize)] == NULL)
+                {
+                        return ((hashval + i*i) % tablesize);
+                }
+
+                i++;
+        }
+}
 
 Word **resize(Word **hashtable)
 {
-	Word **temp;
 	int newSize = tablesize * 2 + 1;
 	int oldsize = tablesize;
-	int forDeleting = tablesize;
 	Word **newtable;
+	Word **oldtable;
 	unsigned int hash;
 	/* This also sets tablesize to newSize */
 	newtable = make_table(newSize);
+	oldtable = hashtable;
+	hashtable = newtable;
 
+
+	
 	while (oldsize > 0)
 	{
 		oldsize--;
 		/* Checks to make sure the index being checked has a Word */
-		if(hashtable[oldsize] != NULL){
-			
-			hash = hash_code(hashtable[oldsize]->word);
-			/*fprintf(stderr, "%d hashcode \n", hash);*/
-			if (newtable[hash % tablesize] != NULL)
-				hash = get_index(hash_code(hashtable[oldsize]->word));
-			/*fprintf(stderr, "%d new index \n", hash);*/
-			if(hash != -1){
-				newtable[hash] = hash_node(hashtable[oldsize]->word);
+		if(oldtable[oldsize] != NULL){
+			hash = hash_code(oldtable[oldsize]->word);
+			if (newtable[hash % tablesize] != NULL){
+				hash = get_index_resize(newtable, hash_code(oldtable[oldsize]->word), oldtable[oldsize]->word);
 			}
+			newtable[hash % tablesize] = hash_node(oldtable[oldsize]->word, oldtable[oldsize]->frequency);
 		}
 
 	}
-	/*delete(hashtable, forDeleting);*/
-	hashtable = newtable;
-	/*tablesize = newSize;
+	delete(oldtable, oldsize);
+	/*hashtable = newtable;
+	tablesize = newSize;
 	print_table();*/
 	return newtable;
 }
@@ -261,13 +262,15 @@ void delete(Word **hashtable, int size)
 /* Quicksort algorithm */
 int compare(const void *a, const void *b)
 {
-	if (a == NULL && b == NULL)
+	const Word *word1 = *(const Word **)a;
+	const Word *word2 = *(const Word **)b;
+	if (word1 == NULL && word2 == NULL)
 		return 0;
-	if (a == NULL)
+	if (word1 == NULL)
 		return 1;
-	if (b == NULL)
+	if (word2 == NULL)
 		return -1;
-	return (((Word*)b)->frequency - ((Word*)a)->frequency);
+	return (word1->frequency - word2->frequency);
 }
 
 Word **sort(Word **hashtable)
