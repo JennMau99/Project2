@@ -27,6 +27,7 @@ Word **make_table(int size)
         }
 }
 
+void hash_words(int filename, char **argv, int argc)
 {
 	FILE *fp;
 	char *token;
