@@ -122,27 +122,26 @@ Word* hash_node(char *s)
 unsigned int hash_code(char *s)
 {
 	unsigned int hashval;
-	
+	/* We have to change this line here */
+	/*
 	if(s == NULL)
 	{
 		return NULL;
 	}
+	*/
 	for(hashval = 0; *s != '\0'; s++)
 	{
 		hashval = *s + 31 * hashval;
 	}
-	return hashval;
+	return hashval % tablesize;
 
 }   
 
 int get_index(unsigned int hashval)
 {
 	int i = 0;
+	/* Unnecessary comparison- this shouldn't be NULL since it's an int */
 	
-	if(hashval == NULL)
-	{
-		return -1;
-	}
 	while (1)
 	{
 		if(hashtable[((hashval + i * i) % tablesize)] == NULL)
@@ -180,8 +179,8 @@ int main(int argc, char **argv)
 		filenames = 1;
 	}
 	
- 	 hash_words(filenames, argv, argc);
-	fprintf(stderr, "%d\n", tablesize);
+ 	hash_words(filenames, argv, argc);
+	fprintf(stderr, "%d tablesize \n", tablesize);
 	/*hashtable = sort(hashtable);
 	while (*wordnum > 0 i < tablesize)
 	{
@@ -217,25 +216,36 @@ int main(int argc, char **argv)
 
 Word **resize(Word **hashtable)
 {
+	Word **temp;
 	int newSize = tablesize * 2 + 1;
 	int oldsize = tablesize;
+	int forDeleting = tablesize;
 	Word **newtable;
 	unsigned int hash;
+	/* This also sets tablesize to newSize */
 	newtable = make_table(newSize);
 
 	while (oldsize > 0)
 	{
 		oldsize--;
+		/* Checks to make sure the index being checked has a Word */
 		if(hashtable[oldsize] != NULL){
-			hash = get_index(hash_code(hashtable[oldsize]->word));
+			
+			hash = hash_code(hashtable[oldsize]->word);
+			/*fprintf(stderr, "%d hashcode \n", hash);*/
+			if (newtable[hash % tablesize] != NULL)
+				hash = get_index(hash_code(hashtable[oldsize]->word));
+			/*fprintf(stderr, "%d new index \n", hash);*/
 			if(hash != -1){
 				newtable[hash] = hash_node(hashtable[oldsize]->word);
 			}
 		}
 
 	}
-	delete(hashtable, oldsize);
-	tablesize = newSize;
+	/*delete(hashtable, forDeleting);*/
+	hashtable = newtable;
+	/*tablesize = newSize;
+	print_table();*/
 	return newtable;
 }
 
