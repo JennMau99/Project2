@@ -17,6 +17,17 @@ static Word hashtable[hashsize];
 Word hash_node(char *s);
 int hash_code(char *s);
 
+
+Word **make_table(int size)
+{
+	int i = 0;
+	Word **newtable = malloc(size *sizeof(Word));
+	for (i = 0; i < newSize; i++)
+	{
+		newtable[i] = NULL;
+	}
+}
+
 void hash_words(int filename, char **argv, int argc)
 {
 	FILE *fp;

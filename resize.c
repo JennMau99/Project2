@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include "fw.h"
 
+
 void delete(Word **hashtable, int size);
 
 Word **resize(Word **hashtable, int size)

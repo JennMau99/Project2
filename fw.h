@@ -10,6 +10,7 @@ struct word{
 	int frequency;
 };
 
+
 typedef struct word Word;
 
 Word **resize(Word **hashtable, int size);
