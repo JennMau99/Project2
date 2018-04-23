@@ -12,4 +12,7 @@ struct word{
 
 typedef struct word Word;
 
+Word **resize(Word **hashtable, int size);
+void delte(Word **hashtable, int size);
+
 #endif

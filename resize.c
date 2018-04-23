@@ -10,11 +10,14 @@
 #include <stdlib.h>
 #include "fw.h"
 
+void delete(Word **hashtable, int size);
+
 Word **resize(Word **hashtable, int size)
 {
 	int newSize = size * 2 + 1;
 	int collision = 0;
 	int i = 0;
+	int oldsize = size;
 	Word **newtable;
 	unsigned int hash;
 	newtable = malloc(newSize * sizeof(Word));
@@ -46,6 +49,16 @@ Word **resize(Word **hashtable, int size)
 			}
 		}
 	}
-free(hashtable);
+size = newSize;
+delete(hashtable, oldsize);
 return newtable;
+}
+
+void delete(Word **hashtable, int size)
+{
+	while (size > 0)
+	{
+		size--;
+		free(hashtable[size]);
+	}
 }

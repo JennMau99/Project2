@@ -72,8 +72,6 @@ int get_index(int hashval)
 
 int main(int argc, char **argv)
 {
-<<<<<<< HEAD
-=======
 	int wordnum = 10;	
 	int filenames = 0;
 	if(argc > 2 && (strcmp(argv[1], "-n") == 0))
@@ -93,4 +91,3 @@ int main(int argc, char **argv)
 }
 
 	
->>>>>>> a2d603fe20f5b48c982492069f56f456656aafe6
