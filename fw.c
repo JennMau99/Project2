@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "fw.h"
-
+#include <ctype.h>
 /*struct word {
 	char *word;
 	int frequency;
@@ -41,12 +41,13 @@ void print_table(int wordnum)
 {
 	int i = tablesize - 1;
 	int a = wordnum;
+	int maxwidth = 9;
 	fprintf(stderr, "The top %d words (out of %d) are:\n", wordnum, tableitems);
  	while(i >= 0 && a > 0)
         {
 		
                 if(hashtable[i] != NULL){
-                        fprintf(stderr, "\t%d %s\n", hashtable[i]->frequency, hashtable[i]->word);
+                        fprintf(stderr, "%*d %s\n",maxwidth, hashtable[i]->frequency, hashtable[i]->word);
              		a--;
 		}
                 i--;
@@ -74,7 +75,8 @@ void hash_words(int filename, char **argv, int argc)
 	char str[100];
 	int size = 2;
 	unsigned int index;
-
+	char *lowered;
+	int i = 0;
 	hashtable = make_table(size);
 	while(filename < argc)
 	{
@@ -88,9 +90,14 @@ void hash_words(int filename, char **argv, int argc)
 		{
 			token = strtok(str, " \n");
 			while( token != NULL ) {
+				i = 0;
 				if((tableitems/tablesize) > 0.5)
 				{
 					hashtable = resize(hashtable);
+				}
+				for(i = 0; token[i] != '\0'; i++)
+				{
+					token[i] = (char)tolower(token[i]);
 				}
 				index = get_index(hash_code(token), token, 1);
 				if(hashtable[index] == NULL){
