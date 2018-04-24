@@ -173,7 +173,7 @@ int get_index(unsigned int hashval, char *s, int resize)
  * 3) Calls sort() to sort the hashtable.
  * 4) Calls print_table() to print the top values from the hashtable.
  * */
-int main(int argc, char **argv)i
+int main(int argc, char **argv)
 {
 	int wordnum = 10;	
 	int filenames = 0;
