@@ -69,6 +69,10 @@ void hash_words(int filename, char **argv, int argc)
 	int size = 2;
 	unsigned int index;
 	int i = 0;
+	int buffermax = 10;
+	int strlength = 0;
+	char *buffer;
+	char ch;
 	hashtable = make_table(size);
 	while(filename < argc)
 	{
@@ -83,7 +87,45 @@ void hash_words(int filename, char **argv, int argc)
 		}
 		else
 		{
+			ch = getc(fp);
+			buffer = (char *) malloc(sizeof(char) * buffermax);
+			while(ch != EOF)
+			{
+				if ((tableitems/tablesize) > 0.5)
+					hashtable = resize(hashtable);
+				if (strlength == buffermax)
+				{
+					buffermax *= 2;
+					buffer = realloc(buffer, buffermax);
+				}
+				if (isalnum(ch))
+				{	
+					/*you might have to check for chars*/
+					ch = (char)tolower(ch);
+					buffer[strlength] = ch;
+					strlength++;
+				}
+				else if (strlength != 0 && isalnum(buffer[0]))
+				{
+					buffer[strlength] = '\0';
+					index = get_index(hash_code(buffer), buffer, 1);
+					if (hashtable[index] == NULL)
+					{
+						hashtable[index] = hash_node(buffer, 1);
+						tableitems++;
+					}
+					else
+						hashtable[index]->frequency++;
+					free(buffer);
+					buffermax = 10;
+					strlength = 0;
+					buffer = (char *) malloc(sizeof(char) * buffermax);
+				}
+				ch = getc(fp);
+			}			
+
 			/* this is a problem here, since one of the tests is a really long line */
+			/*
 			while((fgets (str, 100, fp) != NULL))
 			{
 				token = strtok(str, " ^ - . ? ! / _ = + ( ) ~ \\ \t \n");
@@ -111,6 +153,7 @@ void hash_words(int filename, char **argv, int argc)
 	
 				}
 			}
+			*/
 			fclose(fp);
 		}
 		filename++;
