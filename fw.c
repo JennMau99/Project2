@@ -98,18 +98,18 @@ void hash_words(int filename, char **argv, int argc)
 					buffermax *= 2;
 					buffer = realloc(buffer, buffermax);
 				}
-				if (isalnum(ch))
+				if (isalpha(ch))
 				{	
 					/*you might have to check for chars*/
 					ch = (char)tolower(ch);
 					buffer[strlength] = ch;
 					strlength++;
 				}
-				else if (strlength != 0 && isalnum(buffer[0]))
+				else if (strlength != 0 /*&& isalnum(buffer[0])*/)
 				{
 					buffer[strlength] = '\0';
 					index = get_index(hash_code(buffer), buffer, 1);
-					if (hashtable[index] == NULL)
+					if (hashtable[index] == NULL /*&& isalnum(buffer[0])*/)
 					{
 						hashtable[index] = hash_node(buffer, 1);
 						tableitems++;
