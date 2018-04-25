@@ -186,12 +186,17 @@ int main(int argc, char **argv)
 {
 	int wordnum = 10;	
 	int filenames = 0;
-	if(argc > 2 && (strcmp(argv[1], "-n") == 0))
+	if(argc > 1 && (strcmp(argv[1], "-n") == 0))
 	{
-		wordnum = atoi(argv[2]);
-		if(argc > 2)
-		{	
+		if(argc > 2 && atoi(argv[2]) != 0)
+		{
+			wordnum = atoi(argv[2]);	
 			filenames = 3;
+		}
+		else
+		{
+			fprintf(stderr, "usage fw [-n num] [ file1 [ file 2 ...] ]");
+			return 1;
 		}
 	}
 	else if(argc == 1)
