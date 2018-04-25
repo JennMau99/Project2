@@ -46,12 +46,10 @@ void print_table(int wordnum)
 		
                 if(hashtable[i] != NULL){
                         fprintf(stderr, "%*d %s\n",maxwidth, hashtable[i]->frequency, hashtable[i]->word);
-             		a--;
-		}
+            	 		a--;
+				}
                 i--;
         }
-
-	
 }
 /* Hashes each word from the input file into the hash table.
  * 1) Open the file. If a file isn't given, use stdin instead. 
@@ -64,11 +62,8 @@ void print_table(int wordnum)
 void hash_words(int filename, char **argv, int argc)
 {
 	FILE *fp;
-	char *token;
-	char str[100];
 	int size = 2;
 	unsigned int index;
-	int i = 0;
 	int buffermax = 10;
 	int strlength = 0;
 	char *buffer;
@@ -122,38 +117,9 @@ void hash_words(int filename, char **argv, int argc)
 					buffer = (char *) malloc(sizeof(char) * buffermax);
 				}
 				ch = getc(fp);
-			}			
-
-			/* this is a problem here, since one of the tests is a really long line */
-			/*
-			while((fgets (str, 100, fp) != NULL))
-			{
-				token = strtok(str, " ^ - . ? ! / _ = + ( ) ~ \\ \t \n");
-				while( token != NULL ) {
-					i = 0;
-					if((tableitems/tablesize) > 0.5)
-					{
-						hashtable = resize(hashtable);
-					}
-					for(i = 0; token[i] != '\0'; i++)
-					{
-						token[i] = (char)tolower(token[i]);
-					}
-					index = get_index(hash_code(token), token, 1);
-					if(hashtable[index] == NULL){
-						hashtable[index] = hash_node(token, 1);
-						tableitems++; 		
-					}	
-					else 
-					{	
-					hashtable[index]->frequency++;
-					}
-						
-					token = strtok(NULL, " \n");
-	
-				}
 			}
-			*/
+			free(buffer);			
+
 			fclose(fp);
 		}
 		filename++;
