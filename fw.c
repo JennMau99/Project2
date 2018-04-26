@@ -46,11 +46,70 @@ void print_table(int wordnum)
 		
                 if(hashtable[i] != NULL){
                         fprintf(stderr, "%*d %s\n",maxwidth, hashtable[i]->frequency, hashtable[i]->word);
+						free(hashtable[i]->word);
             	 		a--;
 				}
+				free(hashtable[i]);
                 i--;
         }
+		free(hashtable);
 }
+
+int hash_words_helper(char *buffer, int strlength)
+{
+	unsigned int index;
+	buffer[strlength] = '\0';
+	index = get_index(hash_code(buffer), buffer, 1);
+	if (hashtable[index] == NULL)
+	{
+		hashtable[index] = hash_node(buffer, 1);
+		return 1; /*tableitems++*/
+	}
+	else
+		hashtable[index]->frequency++;
+		return 0;
+}
+
+void separate_by_words(FILE *fp)
+{
+	char ch;
+	char *buffer;
+	int buffermax = 10;
+	int strlength = 0;
+	ch = getc(fp);
+	buffer = (char *) malloc(sizeof(char) * buffermax);
+	while(ch != EOF)
+	{
+		if ((tableitems/tablesize) > 0.5)
+			hashtable = resize(hashtable);
+		if (strlength == buffermax)
+		{
+			buffermax *= 2;
+			buffer = realloc(buffer, buffermax);
+		}
+		if (isalpha(ch))
+		{	
+			ch = (char)tolower(ch);
+			buffer[strlength] = ch;
+			strlength++;
+		}
+		else if (strlength != 0)
+		{
+			tableitems = tableitems + hash_words_helper(buffer, strlength);
+			
+			free(buffer);
+			buffermax = 10;
+			strlength = 0;
+			buffer = (char *) malloc(sizeof(char) * buffermax);
+		}
+		
+		ch = getc(fp);
+	}
+	free(buffer);			
+
+	fclose(fp);
+}
+
 /* Hashes each word from the input file into the hash table.
  * 1) Open the file. If a file isn't given, use stdin instead. 
  * 		If the file doesn't exist, print an error and continue.
@@ -63,11 +122,6 @@ void hash_words(int filename, char **argv, int argc)
 {
 	FILE *fp;
 	int size = 2;
-	unsigned int index;
-	int buffermax = 10;
-	int strlength = 0;
-	char *buffer;
-	char ch;
 	hashtable = make_table(size);
 	while(filename < argc)
 	{
@@ -82,45 +136,7 @@ void hash_words(int filename, char **argv, int argc)
 		}
 		else
 		{
-			ch = getc(fp);
-			buffer = (char *) malloc(sizeof(char) * buffermax);
-			while(ch != EOF)
-			{
-				if ((tableitems/tablesize) > 0.5)
-					hashtable = resize(hashtable);
-				if (strlength == buffermax)
-				{
-					buffermax *= 2;
-					buffer = realloc(buffer, buffermax);
-				}
-				if (isalpha(ch))
-				{	
-					/*you might have to check for chars*/
-					ch = (char)tolower(ch);
-					buffer[strlength] = ch;
-					strlength++;
-				}
-				else if (strlength != 0 /*&& isalnum(buffer[0])*/)
-				{
-					buffer[strlength] = '\0';
-					index = get_index(hash_code(buffer), buffer, 1);
-					if (hashtable[index] == NULL /*&& isalnum(buffer[0])*/)
-					{
-						hashtable[index] = hash_node(buffer, 1);
-						tableitems++;
-					}
-					else
-						hashtable[index]->frequency++;
-					free(buffer);
-					buffermax = 10;
-					strlength = 0;
-					buffer = (char *) malloc(sizeof(char) * buffermax);
-				}
-				ch = getc(fp);
-			}
-			free(buffer);			
-
-			fclose(fp);
+			separate_by_words(fp);
 		}
 		filename++;
 		
