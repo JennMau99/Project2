@@ -6,7 +6,7 @@
 #include <ctype.h>
 
 /* Global variables */
-static Word **hashtable;
+Word **hashtable;
 int tablesize;
 int tableitems;
 

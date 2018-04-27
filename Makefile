@@ -7,7 +7,7 @@ all : $(MAIN)
 $(MAIN) : $(OBJS)
 	$(CC) $(CFLAGS) -o $(MAIN) $(OBJS)
 
-mytr.o : fw.c
+fw.o : fw.c fw.h
 	$(CC) $(CFLAGS) -c fw.c
 
 clean :
